@@ -13,7 +13,10 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: [
+      "http://localhost:5173",
+      process.env.FRONTEND_URL,
+    ].filter(Boolean),
     credentials: true,
   })
 );
@@ -30,7 +33,7 @@ app.get("/", (req, res) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 3000;
+// Database health check
 app.get("/api/health/db", async (req, res) => {
   try {
     const result = await pool.query("SELECT NOW()");
@@ -47,6 +50,9 @@ app.get("/api/health/db", async (req, res) => {
     });
   }
 });
+
+// Start server
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
